@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>나만의 URL 단축기</title>
+    <style>
+        /* 화면을 예쁘게 꾸며주는 CSS */
+        body { font-family: 'Malgun Gothic', sans-serif; text-align: center; margin-top: 100px; }
+        input { padding: 10px; width: 350px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 5px; }
+        button:hover { background-color: #0056b3; }
+        #result { margin-top: 30px; font-size: 18px; font-weight: bold; line-height: 1.5; }
+        a { color: #28a745; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<h1>🚀 나만의 URL 단축기</h1>
+<p>단축하고 싶은 긴 URL을 입력하세요!</p>
+
+<input type="text" id="urlInput" placeholder="https://example.com 처럼 입력해주세요">
+<button onclick="shortenUrl()">단축하기</button>
+
+<div id="result"></div>
+
+<script>
+    // 버튼을 누르면 실행되는 마법의 함수
+    async function shortenUrl() {
+        const originalUrl = document.getElementById('urlInput').value;
+        const resultDiv = document.getElementById('result');
+
+        if (!originalUrl) {
+            alert("URL을 입력해주세요!");
+            return;
+        }
+
+        try {
+            // 1. 우리가 만든 백엔드 API로 POST 요청을 보냅니다 (Postman과 완벽히 동일한 역할!)
+            const response = await fetch('/api/links', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ originalUrl: originalUrl })
+            });
+
+            // 2. 백엔드에서 응답한 데이터(JSON)를 받습니다.
+            const data = await response.json();
+
+            // 3. 화면에 생성된 단축 URL을 보여줍니다.
+            const shortUrl = `http://localhost:8080/api/${data.shortCode}`;
+            resultDiv.innerHTML = `
+                    ✨ 단축 성공!<br>
+                    👉 <a href="${shortUrl}" target="_blank">${shortUrl}</a>
+                `;
+        } catch (error) {
+            console.error("에러 발생:", error);
+            resultDiv.innerHTML = "❌ 서버와 통신하는 중 문제가 발생했습니다.";
+        }
+    }
+</script>
+</body>
+</html>

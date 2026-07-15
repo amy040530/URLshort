@@ -3,23 +3,34 @@ package com.example.urlshort.controller;
 import com.example.urlshort.service.LinkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.HttpStatus;       // 추가됨
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
+import java.util.Map;
+import java.util.HashMap;
 
-@RestController // 데이터를 직접 반환하는 API 컨트롤러입니다.
-@RequestMapping("/api") // 이 컨트롤러의 기본 주소는 /api 로 시작합니다.
+@RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class UrlController {
 
     private final LinkService linkService;
 
-    // POST 방식으로 /api/shorten 주소에 요청이 오면 실행됩니다.
-    @PostMapping("/shorten")
-    public String shortenUrl(@RequestParam String originalUrl) {
-        // 서비스에 원래 URL을 넘겨주고, 단축된 코드를 받아와서 화면에 출력합니다.
-        return linkService.createShortUrl(originalUrl);
+    // 💡 프론트엔드 주소(/api/links)에 맞게 변경하고, JSON 데이터를 받도록 @RequestBody를 사용합니다.
+    @PostMapping("/links")
+    public Map<String, String> shortenUrl(@RequestBody Map<String, String> requestData) {
+        // 1. 프론트엔드에서 JSON으로 보낸 {"originalUrl": "입력한주소"} 에서 원본 URL을 꺼냅니다.
+        String originalUrl = requestData.get("originalUrl");
+
+        // 2. 기존 서비스 로직을 실행해서 단축 코드를 생성합니다.
+        String shortCode = linkService.createShortUrl(originalUrl);
+
+        // 3. 프론트엔드가 기대하는 JSON {"shortCode": "단축코드"} 형태로 만들어서 돌려줍니다.
+        Map<String, String> response = new HashMap<>();
+        response.put("shortCode", shortCode);
+
+        return response;
     }
 
     @GetMapping("/{shortCode}")
