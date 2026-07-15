@@ -37,6 +37,16 @@ public class LinkService {
         return shortCode;
     }
 
+    public String getOriginalUrl(String shortCode) {
+        // 1. 단축 코드로 DB에서 데이터를 찾습니다.
+        Link link = linkRepository.findByShortCode(shortCode)
+                // 2. 만약 없는 코드라면 에러를 발생시킵니다.
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 단축 URL입니다."));
+
+        // 3. 찾은 데이터에서 원본 URL만 쏙 빼서 반환합니다.
+        return link.getOriginalUrl();
+    }
+
     // [참고] 무작위 영문 대소문자 + 숫자 조합을 만들어주는 도우미 메서드
     private String generateRandomCode(int length) {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

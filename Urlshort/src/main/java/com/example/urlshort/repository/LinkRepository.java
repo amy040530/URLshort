@@ -6,6 +6,6 @@ import java.util.Optional;
 
 // JpaRepository<엔티티 클래스, PK 데이터 타입> 을 상속받습니다.
 public interface LinkRepository extends JpaRepository<Link, Long> {
-    // 단축 코드로 원본 URL을 찾기 위한 메서드 (나중에 쓰입니다!)
+    // 단축 코드로 원본 URL을 찾기 위한 메서드
     Optional<Link> findByShortCode(String shortCode);
 }
